@@ -1,4 +1,5 @@
 import { html } from '../helpers';
+import { Toast } from 'bootstrap';
 
 export function showToast(message: string, type: 'success' | 'error' | 'warning' = 'success'): void {
   const container = document.getElementById('toast-container');
@@ -7,7 +8,7 @@ export function showToast(message: string, type: 'success' | 'error' | 'warning'
   const bgClass = type === 'success' ? 'text-bg-success' :
     type === 'error' ? 'text-bg-danger' : 'text-bg-warning';
 
-  const toast = html('div', {
+  const toastEl = html('div', {
     className: `toast ${bgClass} border-0`,
     role: 'alert',
     'aria-live': 'assertive',
@@ -25,17 +26,9 @@ export function showToast(message: string, type: 'success' | 'error' | 'warning'
     ])
   ]);
 
-  container.appendChild(toast);
+  container.appendChild(toastEl);
+  toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
 
-  // Initialize and show using Bootstrap JS if available
-  const bs = (window as unknown as Record<string, unknown>).bootstrap;
-  if (bs && typeof bs.Toast === 'function') {
-    const instance = new bs.Toast(toast);
-    instance.show();
-  } else {
-    toast.classList.add('show');
-    setTimeout(() => { toast.remove(); }, 3500);
-  }
-
-  toast.addEventListener('hidden.bs.toast', () => toast.remove());
+  const toast = new Toast(toastEl);
+  toast.show();
 }
